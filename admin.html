@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel administrativo — TCC</title><link rel="stylesheet" href="style.css"></head>
+<body><main class="container">
+<section class="card" id="loginBox"><h1>Painel administrativo</h1>
+<p>Entre com a conta de administrador.</p>
+<input id="email" type="email" placeholder="E-mail">
+<input id="password" type="password" placeholder="Senha">
+<button id="login">Entrar</button><p id="loginStatus"></p></section>
+
+<section id="dashboard" style="display:none">
+<div class="card"><div class="top"><div><h1>Painel de respostas</h1><p id="count"></p></div><button id="logout" class="secondary">Sair</button></div>
+<label>Etapa <select id="stageFilter"><option value="todos">Todas</option><option value="antes">Antes</option><option value="depois">Depois</option></select></label>
+<input id="search" placeholder="Pesquisar por nome">
+</div>
+<div id="stats"></div>
+<div class="card"><h2>Respostas individuais</h2><div id="people"></div></div>
+</section>
+</main>
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script src="admin.js"></script>
+</body></html>
