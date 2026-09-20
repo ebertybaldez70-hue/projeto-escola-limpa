@@ -1,40 +1,268 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>Controle do Almoxarifado</title>
+<title>Controle do Almoxarifado</title>
 
-  <style>
-    :root{
-      --blue:#2563eb;
-      --blue-dark:#1d4ed8;
-      --blue-light:#eff6ff;
-      --bg:#f4f7fb;
-      --text:#172033;
-      --muted:#64748b;
-      --border:#dbe3ef;
-      --white:#fff;
-    }
+<style>
+:root{
+  --blue:#2563eb;
+  --blue-dark:#1d4ed8;
+  --blue-light:#eff6ff;
+  --bg:#f4f7fb;
+  --text:#172033;
+  --muted:#64748b;
+  --border:#dbe3ef;
+  --white:#fff;
+}
 
-    *{
-      box-sizing:border-box;
-    }
+*{
+  box-sizing:border-box;
+}
 
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:Arial,Helvetica,sans-serif;
-    }
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
 
-    .header{
-      background:var(--blue);
-      color:white;
-      padding:28px 18px;
-      box-shadow:0 2px 8px #0001;
-    }
+.header{
+  background:var(--blue);
+  color:white;
+  padding:28px 18px;
+  box-shadow:0 2px 8px #0001;
+}
+
+.header-content{
+  max-width:760px;
+  margin:auto;
+}
+
+.header h1{
+  margin:0 0 7px;
+  font-size:25px;
+}
+
+.header p{
+  margin:0;
+  opacity:.9;
+  font-size:14px;
+}
+
+.container{
+  width:min(760px,calc(100% - 24px));
+  margin:18px auto 40px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px #00000008;
+}
+
+.card label{
+  display:block;
+  margin-bottom:16px;
+}
+
+.card label:last-child{
+  margin-bottom:0;
+}
+
+.card b{
+  font-size:14px;
+}
+
+.req{
+  color:#dc2626;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  margin-top:7px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:13px;
+  font-size:15px;
+  outline:none;
+  background:white;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px #2563eb18;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.q{
+  color:var(--text);
+  font-size:16px;
+  line-height:1.5;
+  font-weight:600;
+  margin-bottom:14px;
+}
+
+.option{
+  display:flex !important;
+  align-items:center;
+  gap:10px;
+  padding:12px !important;
+  border:1px solid var(--border);
+  border-radius:9px;
+  margin:7px 0 !important;
+  cursor:pointer;
+  font-size:14px;
+  background:white;
+}
+
+.option:hover{
+  background:var(--blue-light);
+  border-color:#93c5fd;
+}
+
+.option input{
+  width:auto;
+  margin:0;
+}
+
+.scale{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.scale label{
+  margin:0 !important;
+  text-align:center;
+}
+
+.scale input{
+  display:none;
+}
+
+.scale span{
+  display:block;
+  padding:14px 5px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:bold;
+  color:var(--muted);
+}
+
+.scale input:checked + span{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:white;
+}
+
+small{
+  color:var(--muted);
+}
+
+#send{
+  width:100%;
+  border:0;
+  border-radius:10px;
+  padding:15px;
+  background:var(--blue);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#send:hover{
+  background:var(--blue-dark);
+}
+
+#send:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+#status{
+  text-align:center;
+  margin-top:14px;
+  font-size:14px;
+  line-height:1.5;
+}
+
+@media(max-width:520px){
+
+  .header{
+    padding:23px 15px;
+  }
+
+  .header h1{
+    font-size:21px;
+  }
+
+  .container{
+    width:calc(100% - 16px);
+    margin-top:12px;
+  }
+
+  .card{
+    padding:15px;
+    border-radius:12px;
+  }
+
+  .scale{
+    gap:5px;
+  }
+
+  .scale span{
+    padding:13px 3px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-content">
+    <h1>📦 Controle do Almoxarifado</h1>
+    <p>Pesquisa sobre o controle e organização dos produtos</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <form id="survey"></form>
+
+  <section class="card">
+    <button id="send" type="button">
+      Enviar respostas
+    </button>
+
+    <div id="status"></div>
+  </section>
+
+</main>
+
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>    }
 
     .header-content{
       max-width:760px;
