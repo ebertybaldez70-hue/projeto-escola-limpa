@@ -1,23 +1,417 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pesquisa — Controle de Almoxarifado</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<main class="container">
-<section class="card">
-<h1>Pesquisa sobre o Controle de Almoxarifado</h1>
-<p>Responda às perguntas abaixo. Esta pesquisa faz parte do projeto de TCC e será usada para avaliar o controle do almoxarifado antes e depois da implantação da proposta.</p>
-</section>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<form id="survey"></form>
-<button id="send">Enviar respostas</button>
-<p id="status"></p>
+  <title>Controle do Almoxarifado</title>
+
+  <style>
+    :root{
+      --blue:#2563eb;
+      --blue-dark:#1d4ed8;
+      --blue-light:#eff6ff;
+      --bg:#f4f7fb;
+      --text:#172033;
+      --muted:#64748b;
+      --border:#dbe3ef;
+      --white:#fff;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,Helvetica,sans-serif;
+    }
+
+    .header{
+      background:var(--blue);
+      color:white;
+      padding:28px 18px;
+      box-shadow:0 2px 8px #0001;
+    }
+
+    .header-content{
+      max-width:760px;
+      margin:auto;
+    }
+
+    .header h1{
+      margin:0 0 7px;
+      font-size:25px;
+    }
+
+    .header p{
+      margin:0;
+      opacity:.9;
+      font-size:14px;
+    }
+
+    .container{
+      width:min(760px,calc(100% - 24px));
+      margin:18px auto 40px;
+    }
+
+    .card{
+      background:white;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      margin-bottom:14px;
+      box-shadow:0 2px 8px #00000008;
+    }
+
+    .card h2{
+      margin:0 0 6px;
+      font-size:19px;
+    }
+
+    .card-description{
+      color:var(--muted);
+      font-size:14px;
+      margin:0 0 18px;
+      line-height:1.5;
+    }
+
+    label{
+      display:block;
+      font-weight:600;
+      margin-bottom:7px;
+      font-size:14px;
+    }
+
+    input,
+    textarea,
+    select{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:9px;
+      padding:13px;
+      font-size:15px;
+      outline:none;
+      background:white;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 3px #2563eb18;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .stage{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .stage label{
+      margin:0;
+    }
+
+    .stage input{
+      display:none;
+    }
+
+    .stage-option{
+      display:block;
+      padding:15px;
+      text-align:center;
+      border:2px solid var(--border);
+      border-radius:10px;
+      cursor:pointer;
+      background:white;
+      transition:.15s;
+    }
+
+    .stage input:checked + .stage-option{
+      border-color:var(--blue);
+      background:var(--blue-light);
+      color:var(--blue-dark);
+    }
+
+    .progress-area{
+      margin-bottom:14px;
+    }
+
+    .progress-top{
+      display:flex;
+      justify-content:space-between;
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:7px;
+    }
+
+    .progress{
+      height:8px;
+      background:#e5e7eb;
+      border-radius:20px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:var(--blue);
+      transition:.2s;
+    }
+
+    .question{
+      position:relative;
+    }
+
+    .question-number{
+      color:var(--blue);
+      font-size:13px;
+      font-weight:bold;
+      margin-bottom:7px;
+    }
+
+    .question-title{
+      font-size:16px;
+      line-height:1.45;
+      font-weight:600;
+      margin-bottom:14px;
+    }
+
+    .option{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:9px;
+      margin:7px 0;
+      cursor:pointer;
+      font-size:14px;
+      background:white;
+    }
+
+    .option:hover{
+      background:var(--blue-light);
+    }
+
+    .option input{
+      width:auto;
+      margin:0;
+    }
+
+    .submit-card{
+      text-align:center;
+    }
+
+    button{
+      width:100%;
+      border:0;
+      border-radius:10px;
+      padding:15px;
+      background:var(--blue);
+      color:white;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:var(--blue-dark);
+    }
+
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    #status{
+      margin-top:12px;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .success{
+      color:#15803d;
+      font-weight:bold;
+    }
+
+    .error{
+      color:#dc2626;
+      font-weight:bold;
+    }
+
+    @media(max-width:520px){
+      .header{
+        padding:23px 15px;
+      }
+
+      .header h1{
+        font-size:21px;
+      }
+
+      .container{
+        width:calc(100% - 16px);
+        margin-top:12px;
+      }
+
+      .card{
+        padding:15px;
+        border-radius:12px;
+      }
+
+      .stage{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-content">
+    <h1>📦 Controle do Almoxarifado</h1>
+    <p>Pesquisa sobre o controle e organização dos produtos</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="card">
+    <h2>Identificação</h2>
+    <p class="card-description">
+      Preencha seus dados para iniciar a pesquisa.
+    </p>
+
+    <label for="name">Nome</label>
+    <input
+      id="name"
+      type="text"
+      placeholder="Digite seu nome"
+      autocomplete="name"
+    >
+
+    <br><br>
+
+    <label>Etapa da pesquisa</label>
+
+    <div class="stage">
+      <label>
+        <input type="radio" name="stage" value="antes" checked>
+        <span class="stage-option">📋 ANTES</span>
+      </label>
+
+      <label>
+        <input type="radio" name="stage" value="depois">
+        <span class="stage-option">✅ DEPOIS</span>
+      </label>
+    </div>
+  </section>
+
+  <div class="progress-area">
+    <div class="progress-top">
+      <span>Progresso da pesquisa</span>
+      <span id="progressText">0 de 25</span>
+    </div>
+
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <form id="surveyForm">
+
+    <!--
+      IMPORTANTE:
+      As perguntas existentes continuam sendo carregadas
+      pelo questions.js.
+    -->
+
+    <div id="questions"></div>
+
+    <section class="card submit-card">
+      <h2>Finalizar pesquisa</h2>
+
+      <p class="card-description">
+        Confira suas respostas e clique abaixo para enviar.
+      </p>
+
+      <button type="submit">
+        Enviar respostas
+      </button>
+
+      <div id="status"></div>
+    </section>
+
+  </form>
+
 </main>
+
 <script src="config.js"></script>
 <script src="questions.js"></script>
 <script src="app.js"></script>
+
+<script>
+/*
+  Apenas melhora o visual/progresso das perguntas.
+  Não altera o conteúdo das perguntas.
+*/
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const container = document.getElementById("questions");
+  const progressBar = document.getElementById("progressBar");
+  const progressText = document.getElementById("progressText");
+
+  function updateProgress(){
+
+    if(!container) return;
+
+    const total = container.querySelectorAll(".question").length;
+
+    if(!total) return;
+
+    let answered = 0;
+
+    container.querySelectorAll(".question").forEach(question => {
+
+      const inputs = question.querySelectorAll("input, textarea, select");
+
+      let hasAnswer = false;
+
+      inputs.forEach(input => {
+
+        if(input.type === "radio" || input.type === "checkbox"){
+          if(input.checked) hasAnswer = true;
+        }else if(input.value && input.value.trim() !== ""){
+          hasAnswer = true;
+        }
+
+      });
+
+      if(hasAnswer) answered++;
+
+    });
+
+    const percentage = Math.round((answered / total) * 100);
+
+    progressBar.style.width = percentage + "%";
+    progressText.textContent = answered + " de " + total;
+  }
+
+  container.addEventListener("change", updateProgress);
+  container.addEventListener("input", updateProgress);
+
+  setTimeout(updateProgress,500);
+});
+</script>
+
 </body>
 </html>
