@@ -40,10 +40,8 @@ async function login() {
     );
 
     if (!r.ok) {
-
       $("loginStatus").textContent =
         "E-mail ou senha inválidos.";
-
       return;
     }
 
@@ -114,6 +112,8 @@ async function showDash() {
 
     all = await r.json();
 
+    populatePeopleFilter();
+
     render();
 
   } catch (error) {
@@ -124,6 +124,54 @@ async function showDash() {
       `<div class="empty">
         Erro ao carregar as respostas.
       </div>`;
+  }
+}
+
+
+// ================================
+// LISTA DE PARTICIPANTES
+// ================================
+
+function populatePeopleFilter() {
+
+  const select = $("personFilter");
+
+  if (!select) return;
+
+  const currentValue = select.value;
+
+  const names = [
+    ...new Set(
+      all
+        .map(response =>
+          String(response.name || "").trim()
+        )
+        .filter(name => name !== "")
+    )
+  ].sort((a, b) =>
+    a.localeCompare(b, "pt-BR")
+  );
+
+  select.innerHTML =
+    `<option value="todos">
+      Todos os participantes
+    </option>`;
+
+  names.forEach(name => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = name;
+    option.textContent = name;
+
+    select.appendChild(option);
+  });
+
+  if (
+    names.includes(currentValue)
+  ) {
+    select.value = currentValue;
   }
 }
 
@@ -142,6 +190,11 @@ function filtered() {
       .trim()
       .toLowerCase();
 
+  const person =
+    $("personFilter")
+      ? $("personFilter").value
+      : "todos";
+
   return all.filter(response => {
 
     const correctStage =
@@ -150,12 +203,21 @@ function filtered() {
 
     const name =
       String(response.name || "")
-        .toLowerCase();
+        .trim();
 
-    const correctName =
-      name.includes(search);
+    const correctPerson =
+      person === "todos" ||
+      name === person;
 
-    return correctStage && correctName;
+    const correctSearch =
+      name.toLowerCase()
+        .includes(search);
+
+    return (
+      correctStage &&
+      correctPerson &&
+      correctSearch
+    );
   });
 }
 
@@ -170,10 +232,14 @@ function renderSummary(rows) {
     all.length;
 
   const before =
-    all.filter(x => x.stage === "antes").length;
+    all.filter(x =>
+      x.stage === "antes"
+    ).length;
 
   const after =
-    all.filter(x => x.stage === "depois").length;
+    all.filter(x =>
+      x.stage === "depois"
+    ).length;
 
   $("totalResponses").textContent =
     total;
@@ -209,12 +275,10 @@ function renderStats(rows) {
           v !== ""
         );
 
-      // --------------------------------
-      // Contagem correta de respostas
-      // --------------------------------
-
       const counts = {};
-      let respondentTotal = values.length;
+
+      const respondentTotal =
+        values.length;
 
       values.forEach(value => {
 
@@ -231,7 +295,6 @@ function renderStats(rows) {
 
           counts[value] =
             (counts[value] || 0) + 1;
-
         }
 
       });
@@ -259,12 +322,6 @@ function renderStats(rows) {
 
       const items =
         entries.map(([option, amount]) => {
-
-          /*
-           * Para perguntas de múltipla escolha,
-           * o percentual é calculado sobre os
-           * participantes que responderam.
-           */
 
           const percentage =
             respondentTotal > 0
@@ -359,10 +416,7 @@ function renderPeople(rows) {
             response.answers?.[q[0]];
 
           if (Array.isArray(answer)) {
-
-            answer =
-              answer.join(", ");
-
+            answer = answer.join(", ");
           }
 
           if (
@@ -370,7 +424,6 @@ function renderPeople(rows) {
             answer === null ||
             answer === ""
           ) {
-
             answer = "Não respondido";
           }
 
@@ -469,6 +522,11 @@ $("stageFilter").onchange =
 $("search").oninput =
   render;
 
+if ($("personFilter")) {
+  $("personFilter").onchange =
+    render;
+}
+
 $("logout").onclick =
   () => {
 
@@ -477,11 +535,10 @@ $("logout").onclick =
     );
 
     location.reload();
-
   };
 
 
-// Permite apertar ENTER no login
+// ENTER NO LOGIN
 
 $("password").addEventListener(
   "keydown",
@@ -502,7 +559,5 @@ $("password").addEventListener(
 if (
   localStorage.getItem("sb_access")
 ) {
-
   showDash();
-
-                }
+}
